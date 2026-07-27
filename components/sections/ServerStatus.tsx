@@ -1,11 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const serverAddress = "play.funlegacy.de";
 
+type ServerStatusData = {
+  online: boolean;
+  playersOnline: number;
+  playersMax: number;
+  version: string;
+  address: string;
+};
+
 export default function ServerStatus() {
   const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<ServerStatusData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadServerStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/server-status", {
+        cache: "no-store",
+      });
+
+      const data = (await response.json()) as ServerStatusData;
+      setStatus(data);
+    } catch (error) {
+      console.error("Serverstatus konnte nicht geladen werden:", error);
+
+      setStatus({
+        online: false,
+        playersOnline: 0,
+        playersMax: 0,
+        version: "Unbekannt",
+        address: serverAddress,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadServerStatus();
+
+    const interval = window.setInterval(loadServerStatus, 60_000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [loadServerStatus]);
 
   async function copyServerAddress() {
     try {
@@ -20,6 +63,8 @@ export default function ServerStatus() {
     }
   }
 
+  const isOnline = status?.online ?? false;
+
   return (
     <section id="spielen" className="relative px-6 py-20">
       <div className="mx-auto max-w-7xl">
@@ -28,9 +73,30 @@ export default function ServerStatus() {
 
           <div className="relative grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-400/10 px-4 py-2 text-sm font-bold text-green-300">
-                <span className="h-2.5 w-2.5 rounded-full bg-green-400 shadow-[0_0_15px_rgba(74,222,128,0.8)]" />
-                Server online
+              <div
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${
+                  loading
+                    ? "border-white/10 bg-white/5 text-slate-300"
+                    : isOnline
+                      ? "border-green-400/20 bg-green-400/10 text-green-300"
+                      : "border-red-400/20 bg-red-400/10 text-red-300"
+                }`}
+              >
+                <span
+                  className={`h-2.5 w-2.5 rounded-full ${
+                    loading
+                      ? "animate-pulse bg-slate-400"
+                      : isOnline
+                        ? "bg-green-400 shadow-[0_0_15px_rgba(74,222,128,0.8)]"
+                        : "bg-red-400"
+                  }`}
+                />
+
+                {loading
+                  ? "Status wird geladen"
+                  : isOnline
+                    ? "Server online"
+                    : "Server offline"}
               </div>
 
               <h2 className="mt-6 text-4xl font-black tracking-tight sm:text-5xl">
@@ -45,17 +111,37 @@ export default function ServerStatus() {
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
                   <p className="text-sm text-slate-500">Status</p>
-                  <p className="mt-2 text-xl font-black text-green-400">Online</p>
+                  <p
+                    className={`mt-2 text-xl font-black ${
+                      loading
+                        ? "text-slate-300"
+                        : isOnline
+                          ? "text-green-400"
+                          : "text-red-400"
+                    }`}
+                  >
+                    {loading ? "Lädt …" : isOnline ? "Online" : "Offline"}
+                  </p>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-                  <p className="text-sm text-slate-500">Plattform</p>
-                  <p className="mt-2 text-xl font-black">Java & Bedrock</p>
+                  <p className="text-sm text-slate-500">Spieler</p>
+                  <p className="mt-2 text-xl font-black">
+                    {loading
+                      ? "–"
+                      : isOnline
+                        ? `${status?.playersOnline ?? 0} / ${
+                            status?.playersMax ?? 0
+                          }`
+                        : "0"}
+                  </p>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-                  <p className="text-sm text-slate-500">Verfügbarkeit</p>
-                  <p className="mt-2 text-xl font-black">24/7</p>
+                  <p className="text-sm text-slate-500">Version</p>
+                  <p className="mt-2 text-xl font-black">
+                    {loading ? "–" : status?.version ?? "Unbekannt"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -83,9 +169,14 @@ export default function ServerStatus() {
                 {copied ? "IP kopiert ✓" : "Server-IP kopieren"}
               </button>
 
-              <p className="mt-4 text-center text-sm text-slate-500">
-                Nach dem Kopieren direkt in Minecraft einfügen.
-              </p>
+              <button
+                type="button"
+                onClick={loadServerStatus}
+                disabled={loading}
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-bold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Status aktualisieren
+              </button>
             </div>
           </div>
         </div>
