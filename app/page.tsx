@@ -1,5 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ServerStatus from "@/components/sections/ServerStatus";
 import VehicleShowcase from "@/components/sections/VehicleShowcase";
 import WhyFunLegacy from "@/components/sections/WhyFunLegacy";
 import NewsSection from "@/components/sections/NewsSection";
@@ -128,6 +129,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ServerStatus />
 
       <VehicleShowcase />
 
