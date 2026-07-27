@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import VehicleShowcase from "@/components/sections/VehicleShowcase";
 import WhyFunLegacy from "@/components/sections/WhyFunLegacy";
 import NewsSection from "@/components/sections/NewsSection";
+import TeamSection from "@/components/sections/TeamSection";
 
 const features = [
   {
@@ -131,6 +132,8 @@ export default function Home() {
       <WhyFunLegacy />
 
       <NewsSection />
+
+      <TeamSection />
 
       <section className="border-y border-white/10 bg-white/[0.02] px-6 py-8">
         <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
