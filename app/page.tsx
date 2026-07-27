@@ -6,6 +6,7 @@ import WhyFunLegacy from "@/components/sections/WhyFunLegacy";
 import NewsSection from "@/components/sections/NewsSection";
 import TeamSection from "@/components/sections/TeamSection";
 import DownloadsSection from "@/components/sections/DownloadsSection";
+import Reveal from "@/components/ui/Reveal";
 
 const features = [
   {
@@ -130,17 +131,29 @@ export default function Home() {
         </div>
       </section>
 
-      <ServerStatus />
+<Reveal>
+  <ServerStatus />
+</Reveal>
 
-      <VehicleShowcase />
+<Reveal delay={100}>
+  <VehicleShowcase />
+</Reveal>
 
-      <WhyFunLegacy />
+<Reveal delay={100} direction="left">
+  <WhyFunLegacy />
+</Reveal>
 
-      <NewsSection />
+<Reveal delay={100} direction="right">
+  <NewsSection />
+</Reveal>
 
-      <TeamSection />
+<Reveal delay={100}>
+  <TeamSection />
+</Reveal>
 
-      <DownloadsSection />
+<Reveal delay={100}>
+  <DownloadsSection />
+</Reveal>
 
       <section className="border-y border-white/10 bg-white/[0.02] px-6 py-8">
         <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
