@@ -1,4 +1,5 @@
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import VehicleShowcase from "@/components/sections/VehicleShowcase";
 import WhyFunLegacy from "@/components/sections/WhyFunLegacy";
 import NewsSection from "@/components/sections/NewsSection";
@@ -154,6 +155,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+      <Footer />
     </main>
   );
 }
